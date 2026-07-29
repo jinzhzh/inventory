@@ -1,0 +1,27 @@
+name: CI - Build & Test
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+      - name: Download deps
+        run: go mod download
+      - name: Vet
+        run: go vet ./...
+      - name: Build
+        run: CGO_ENABLED=0 go build -trimpath -o /dev/null .
+      - name: Validate static
+        run: |
+          test -f static/index.html
+          test -f static/style.css
+          test -f static/app.js
+          node --check static/app.js
