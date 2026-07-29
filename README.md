@@ -28,12 +28,28 @@ go run .
 
 ## 部署
 
+### Docker 本地运行
+
 ```bash
 docker build -t inventory .
 docker run -p 8080:8080 -v ./data:/data inventory
+# 访问 http://localhost:8080
 ```
+
+### Fly.io 部署（免费档）
+
+1. 安装 [flyctl](https://fly.io/docs/flyctl/install/)
+2. 登录：`flyctl auth login`
+3. 部署：`flyctl deploy --app team-inventory`
+4. 公网 URL：`https://team-inventory.fly.dev`
+
+### GitHub Actions 自动部署
+
+在仓库 Settings → Secrets 添加 `FLY_API_TOKEN`，push 到 main 后自动：
+1. 构建 Docker 镜像 → 推送 GHCR（`ghcr.io/jinzhzh/inventory:latest`）
+2. 部署到 Fly.io
 
 ## GitHub Actions
 
-- `ci.yml`: lint + build + 静态校验（push/PR 触发，失败阻断 merge）
+- `ci.yml`: go vet + build + 静态校验（push/PR 触发，失败阻断 merge）
 - `deploy.yml`: 构建 Docker 镜像推送到 GHCR + 部署到 Fly.io
